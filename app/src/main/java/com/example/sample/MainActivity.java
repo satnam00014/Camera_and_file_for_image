@@ -18,6 +18,9 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.Toast;
+
+import java.io.ByteArrayOutputStream;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -81,6 +84,11 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(in,110);
     }
 
+
+    public void go3(View view){
+        startActivity(new Intent(this,ShowImagesActivity.class));
+    }
+
     //below is function which will display image after selecting from galary or files
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent backintent) {
@@ -90,6 +98,12 @@ public class MainActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 Bitmap bmp = (Bitmap) (backintent.getExtras().get("data"));
                 imv1.setImageBitmap(bmp);
+                ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                bmp.compress(Bitmap.CompressFormat.PNG,100,outputStream);
+                byte[] data = outputStream.toByteArray();
+                ImageEntity imageEntity = new ImageEntity(data);
+                ImageDatabase.getInstance(this).imageDAO().insertImage(imageEntity);
+                Toast.makeText(this,"Image is saved",Toast.LENGTH_SHORT).show();
             }
         } else if (requestCode == 110)  //back from gallery
         {
@@ -101,6 +115,12 @@ public class MainActivity extends AppCompatActivity {
                     //following is to get and show image through URI in image view
                     //imv1.setImageURI(uri);
                     imv1.setImageBitmap(bitmap);
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    bitmap.compress(Bitmap.CompressFormat.PNG,100,outputStream);
+                    byte[] data = outputStream.toByteArray();
+                    ImageEntity imageEntity = new ImageEntity(data);
+                    ImageDatabase.getInstance(this).imageDAO().insertImage(imageEntity);
+                    Toast.makeText(this,"Image is saved",Toast.LENGTH_SHORT).show();
                 } catch (Exception exception) {
                     exception.printStackTrace();
                 }
